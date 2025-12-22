@@ -64,4 +64,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+     /**
+     * Mensagens do utilizador
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    /**
+     * Salas onde o utilizador participa
+     */
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class)
+                    ->withTimestamps();
+    }
+
+    /**
+     * Salas criadas pelo utilizador
+     */
+    public function ownedRooms()
+    {
+        return $this->hasMany(Room::class, 'created_by');
+    }
 }
