@@ -46,6 +46,20 @@ onMounted(() => {
       </p>
     </div>
 
+    <div class="border-b pb-2 mb-4 text-sm text-gray-600">
+  <span
+    v-for="user in room.users"
+    :key="user.id"
+    class="inline-flex items-center gap-1 mr-3"
+  >
+    <img
+      :src="user.profile_photo_url"
+      class="w-5 h-5 rounded-full"
+    />
+    {{ user.name }}
+  </span>
+</div>
+
     <!-- Mensagens -->
     <div
       ref="messagesContainer"
