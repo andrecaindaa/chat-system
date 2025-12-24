@@ -44,9 +44,8 @@ class RoomController extends Controller
         return redirect()->route('rooms.index');
     }
 
-    public function show(Room $room)
+   public function show(Room $room)
 {
-    // Segurança: só membros podem aceder
     abort_unless(
         $room->users()->where('user_id', auth()->id())->exists(),
         403
@@ -54,11 +53,12 @@ class RoomController extends Controller
 
     $room->load([
         'users:id,name,profile_photo_path',
-        'messages.sender:id,name,profile_photo_path',
+        'messages.user:id,name,profile_photo_path',
     ]);
 
     return Inertia::render('Rooms/Show', [
         'room' => $room,
     ]);
 }
+
 }

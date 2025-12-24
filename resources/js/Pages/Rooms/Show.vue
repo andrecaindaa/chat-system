@@ -1,21 +1,38 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
+import { ref, onMounted, nextTick } from 'vue'
 
 const props = defineProps({
   room: Object,
 })
 
+const messagesContainer = ref(null)
+
 const form = useForm({
-  body: '',
+  content: '',
 })
+
+const scrollToBottom = async () => {
+  await nextTick()
+  messagesContainer.value.scrollTop =
+    messagesContainer.value.scrollHeight
+}
 
 function sendMessage() {
   form.post(route('rooms.messages.store', props.room.id), {
     preserveScroll: true,
-    onSuccess: () => form.reset(),
+    onSuccess: () => {
+      form.reset()
+      scrollToBottom()
+    },
   })
 }
+
+onMounted(() => {
+  scrollToBottom()
+})
 </script>
+
 
 <template>
   <div class="h-screen flex flex-col max-w-4xl mx-auto p-6">
@@ -30,23 +47,26 @@ function sendMessage() {
     </div>
 
     <!-- Mensagens -->
-    <div class="flex-1 space-y-4 overflow-y-auto mb-4">
+    <div
+      ref="messagesContainer"
+      class="flex-1 space-y-4 overflow-y-auto mb-4"
+    >
       <div
         v-for="message in room.messages"
         :key="message.id"
         class="flex gap-3"
       >
         <img
-          :src="message.sender.profile_photo_url"
+          :src="message.user.profile_photo_url"
           class="w-8 h-8 rounded-full"
         />
 
         <div>
           <div class="text-sm font-semibold">
-            {{ message.sender.name }}
+            {{ message.user.name }}
           </div>
           <div class="text-sm text-gray-800">
-            {{ message.body }}
+            {{ message.content }}
           </div>
         </div>
       </div>
@@ -55,14 +75,14 @@ function sendMessage() {
     <!-- Input -->
     <form @submit.prevent="sendMessage" class="flex gap-2">
       <input
-        v-model="form.body"
+        v-model="form.content"
         type="text"
         placeholder="Escreve uma mensagem…"
         class="flex-1 border rounded px-3 py-2"
       />
       <button
         type="submit"
-        :disabled="form.processing || !form.body"
+        :disabled="form.processing || !form.content"
         class="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
       >
         Enviar
@@ -70,3 +90,4 @@ function sendMessage() {
     </form>
   </div>
 </template>
+
