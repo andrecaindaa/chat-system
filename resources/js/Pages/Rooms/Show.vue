@@ -14,8 +14,10 @@ const form = useForm({
 
 const scrollToBottom = async () => {
   await nextTick()
-  messagesContainer.value.scrollTop =
-    messagesContainer.value.scrollHeight
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop =
+      messagesContainer.value.scrollHeight
+  }
 }
 
 function sendMessage() {
@@ -30,8 +32,15 @@ function sendMessage() {
 
 onMounted(() => {
   scrollToBottom()
+
+  Echo.private(`room.${props.room.id}`)
+    .listen('MessageSent', (e) => {
+      props.room.messages.push(e.message)
+      scrollToBottom()
+    })
 })
 </script>
+
 
 
 <template>
@@ -46,7 +55,7 @@ onMounted(() => {
       </p>
     </div>
 
-    <div class="border-b pb-2 mb-4 text-sm text-gray-600">
+   <div class="border-b pb-2 mb-4 text-sm text-gray-600">
   <span
     v-for="user in room.users"
     :key="user.id"
@@ -57,8 +66,16 @@ onMounted(() => {
       class="w-5 h-5 rounded-full"
     />
     {{ user.name }}
+
+    <span
+      v-if="user.pivot.role === 'admin'"
+      class="text-xs bg-black text-white px-2 rounded ml-1"
+    >
+      admin
+    </span>
   </span>
 </div>
+
 
     <!-- Mensagens -->
     <div
