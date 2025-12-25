@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\MessageController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -36,6 +37,12 @@ Route::middleware([
     ->name('rooms.store');
     Route::get('/rooms/{room}', [RoomController::class, 'show'])
     ->name('rooms.show');
+    Route::post('/rooms/{room}/messages', [MessageController::class, 'store'])
+        ->name('rooms.messages.store');
+
+        Route::post('/rooms/{room}/invite', [RoomController::class, 'invite'])
+    ->name('rooms.invite');
+
 
 });
 

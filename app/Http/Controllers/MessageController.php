@@ -30,7 +30,7 @@ class MessageController extends Controller
         return back();
     }
 
-    public function direct(User $user)
+   public function direct(User $user)
     {
         $authUser = auth()->user();
 
@@ -46,9 +46,13 @@ class MessageController extends Controller
                 'created_by' => $authUser->id,
             ]);
 
-            $room->users()->attach([$authUser->id, $user->id]);
+            $room->users()->attach([
+                $authUser->id,
+                $user->id,
+            ]);
         }
 
         return redirect()->route('rooms.show', $room);
     }
+
 }

@@ -28,28 +28,36 @@ class RoomController extends Controller
      * Criar uma nova sala
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-        ]);
+{
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+    ]);
 
-        $room = Room::create([
-            'name' => $validated['name'],
-            'created_by' => $request->user()->id,
-        ]);
+    $room = Room::create([
+        'name' => $validated['name'],
+        'created_by' => $request->user()->id,
+    ]);
 
-        // adiciona o criador à sala
-        $room->users()->attach($request->user()->id);
+    // Criador entra como ADMIN
+    $room->users()->attach($request->user()->id, [
+        'role' => 'admin',
+    ]);
 
-        return redirect()->route('rooms.index');
-    }
+    return redirect()->route('rooms.show', $room);
+}
 
-   public function show(Room $room)
+
+  public function show(Room $room)
 {
     abort_unless(
         $room->users()->where('user_id', auth()->id())->exists(),
         403
     );
+
+    // marca como lida
+    $room->users()->updateExistingPivot(auth()->id(), [
+        'last_read_at' => now(),
+    ]);
 
     $room->load([
         'users:id,name,profile_photo_path',
@@ -60,5 +68,19 @@ class RoomController extends Controller
         'room' => $room,
     ]);
 }
+
+
+    public function invite(Request $request, Room $room)
+    {
+        abort_unless($room->created_by === auth()->id(), 403);
+
+        $validated = $request->validate([
+            'user_id' => ['required', 'exists:users,id'],
+        ]);
+
+        $room->users()->syncWithoutDetaching($validated['user_id']);
+
+        return back();
+    }
 
 }

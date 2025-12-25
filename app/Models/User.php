@@ -77,10 +77,12 @@ class User extends Authenticatable
      * Salas onde o utilizador participa
      */
     public function rooms()
-    {
-        return $this->belongsToMany(Room::class)
-                    ->withTimestamps();
-    }
+{
+    return $this->belongsToMany(Room::class)
+        ->withPivot('role')
+        ->withTimestamps();
+}
+
 
     /**
      * Salas criadas pelo utilizador

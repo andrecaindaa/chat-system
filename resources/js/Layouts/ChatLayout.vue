@@ -35,7 +35,17 @@ defineProps({
                   ? 'bg-black text-white'
                   : 'hover:bg-gray-100'"
               >
-                # {{ room.name }}
+                <div class="flex items-center gap-2">
+                <span># {{ room.display_name }}</span>
+
+                <span
+                    v-if="room.unread_count > 0"
+                    class="ml-auto text-xs bg-red-500 text-white px-2 rounded-full"
+                >
+                    {{ room.unread_count }}
+                </span>
+                </div>
+
               </a>
             </li>
           </ul>
@@ -59,7 +69,17 @@ defineProps({
                   ? 'bg-black text-white'
                   : 'hover:bg-gray-100'"
               >
-                {{ room.name }}
+                <div class="flex items-center gap-2">
+                <span>{{ room.display_name }}</span>
+
+                <span
+                    v-if="room.unread_count > 0"
+                    class="ml-auto text-xs bg-red-500 text-white px-2 rounded-full"
+                >
+                    {{ room.unread_count }}
+                </span>
+                </div>
+
               </a>
             </li>
           </ul>

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Room;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -37,7 +38,18 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            //
+
+            'rooms' => $request->user()
+                ? $request->user()
+                    ->rooms()
+                    ->with(['users', 'messages'])
+                    ->get()
+                    ->map(function ($room) use ($request) {
+                        $room->unread_count = $room->unreadCountFor($request->user());
+                        $room->display_name = $room->displayNameFor($request->user());
+                        return $room;
+                    })
+                : [],
         ];
     }
 }
