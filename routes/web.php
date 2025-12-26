@@ -6,6 +6,11 @@ use Inertia\Inertia;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\MessageController;
 
+/*
+|--------------------------------------------------------------------------
+| Landing page
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -15,34 +20,51 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Authenticated area
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    /*
+    | Dashboard (post-login)
+    | Dados vêm do HandleInertiaRequests
+    */
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-});
 
-
-
-Route::middleware([
-    'auth',
-    'verified'
-    ])->group(function () {
+    /*
+    | Rooms
+    */
     Route::get('/rooms', [RoomController::class, 'index'])
-    ->name('rooms.index');
+        ->name('rooms.index');
+
     Route::post('/rooms', [RoomController::class, 'store'])
-    ->name('rooms.store');
+        ->name('rooms.store');
+
     Route::get('/rooms/{room}', [RoomController::class, 'show'])
-    ->name('rooms.show');
+        ->name('rooms.show');
+
+    /*
+    | Messages
+    */
     Route::post('/rooms/{room}/messages', [MessageController::class, 'store'])
         ->name('rooms.messages.store');
 
-        Route::post('/rooms/{room}/invite', [RoomController::class, 'invite'])
-    ->name('rooms.invite');
+    /*
+    | Room management
+    */
+    Route::patch('/rooms/{room}/rename', [RoomController::class, 'rename'])
+        ->name('rooms.rename');
 
+    Route::post('/rooms/{room}/invite', [RoomController::class, 'invite'])
+        ->name('rooms.invite');
 
+    Route::post('/rooms/{room}/users/{user}/toggle-admin', [RoomController::class, 'toggleAdmin'])
+        ->name('rooms.users.toggleAdmin');
+
+    Route::delete('/rooms/{room}/users/{user}', [RoomController::class, 'removeUser'])
+        ->name('rooms.users.remove');
 });
-
