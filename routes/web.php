@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,4 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::delete('/rooms/{room}/users/{user}', [RoomController::class, 'removeUser'])
         ->name('rooms.users.remove');
+
+        Route::put('/user/status', [ProfileController::class, 'updateStatus'])
+    ->name('profile.update-status');
 });
